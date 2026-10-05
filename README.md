@@ -1,0 +1,1 @@
+# SGDSB — Sistema de Gerenciamento de Dados para Saúde Bovina (Full-Stack) 

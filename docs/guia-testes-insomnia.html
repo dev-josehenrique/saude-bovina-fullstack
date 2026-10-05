@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de testes da API — SGDSB</title>
+<meta name="description" content="Roteiro de testes da API do SGDSB para fazer no Insomnia: rotas, corpos, respostas esperadas e botões de copiar.">
+<style>
+:root{
+  --bg:#f6f7f4;--sf:#ffffff;--sf2:#f0f3ee;--tx:#17231c;--mu:#5d6b62;--bd:#e0e6df;
+  --brand:#1f6b43;--brand-strong:#17553a;--brand-soft:#e4f1e8;
+  --get:#2454a6;--post:#1f6b43;--put:#a35f00;--del:#b3261e;
+  --ok-bg:#e4f1e8;--ok:#17553a;--warn-bg:#fff1dc;--warn:#8a5200;--err-bg:#fdeceb;--err:#b3261e;--info-bg:#e8f0fb;--info:#2454a6;
+  --code:#f3f5f1;--ring:0 0 0 3px rgba(31,107,67,.3);--radius:12px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1613;--sf:#17211c;--sf2:#1d2a23;--tx:#e9f0eb;--mu:#93a49a;--bd:#2a3a31;
+    --brand:#4fbf83;--brand-strong:#6fd39c;--brand-soft:#1b3327;
+    --get:#8db4f5;--post:#4fbf83;--put:#e0a04d;--del:#ff8b82;
+    --ok-bg:#1b3327;--ok:#6fd39c;--warn-bg:#3a2c12;--warn:#e0a04d;--err-bg:#3a1e1c;--err:#ff8b82;--info-bg:#1b2a45;--info:#8db4f5;
+    --code:#101a15;--ring:0 0 0 3px rgba(79,191,131,.35);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
+h1,h2,h3{line-height:1.2;letter-spacing:-.02em;margin:0}
+p{margin:0}
+code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:.86rem}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:8px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* topo fixo */
+input:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+.btn{font:inherit;font-size:.86rem;font-weight:600;color:var(--tx);background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:.45rem .8rem;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--sf2)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-strong)}
+
+/* layout */
+.layout{max-width:1200px;margin:auto;padding:1.25rem 1rem 5rem;display:grid;grid-template-columns:230px minmax(0,1fr);gap:1.5rem}
+.lateral{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow:auto;display:flex;flex-direction:column;gap:.15rem}
+.lateral a{display:flex;justify-content:space-between;gap:.5rem;padding:.45rem .7rem;border-radius:9px;color:var(--mu);text-decoration:none;font-size:.9rem;font-weight:600}
+.lateral a:hover{background:var(--sf2);color:var(--tx)}
+.lateral a.ativo{background:var(--brand-soft);color:var(--brand-strong)}
+.lateral small{font-variant-numeric:tabular-nums;font-weight:500}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .lateral{position:static;flex-direction:row;overflow-x:auto;max-height:none;padding-bottom:.3rem}
+  .lateral a{white-space:nowrap}
+}
+main{display:flex;flex-direction:column;gap:1.75rem;min-width:0}
+section.secao{scroll-margin-top:16px}
+section.secao>h2{font-size:1.35rem;display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;font-size:.85rem;font-weight:800;flex:none}
+.intro{color:var(--mu);margin-bottom:.9rem}
+
+/* painel de preparação */
+.painel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
+.painel h2{font-size:1.2rem}
+.legenda{display:flex;gap:.5rem 1rem;flex-wrap:wrap;font-size:.85rem;color:var(--mu);align-items:center}
+
+/* cartão de rota */
+details.rota{background:var(--sf);border:1px solid var(--bd);border-radius:var(--radius);margin-bottom:.7rem;overflow:hidden}
+details.rota[open]{border-color:color-mix(in srgb,var(--brand) 45%,var(--bd))}
+details.rota>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem}
+details.rota>summary::-webkit-details-marker{display:none}
+details.rota>summary:hover{background:var(--sf2)}
+.metodo{display:inline-block;min-width:64px;text-align:center;font-weight:800;font-size:.76rem;letter-spacing:.04em;padding:.25rem .5rem;border-radius:7px;color:#fff;flex:none}
+.metodo.peq{min-width:52px;font-size:.7rem;padding:.2rem .4rem}
+.m-GET{background:var(--get)}.m-POST{background:var(--post)}.m-PUT{background:var(--put)}.m-DELETE{background:var(--del)}
+@media (prefers-color-scheme:dark){.metodo{color:#0f1613}}
+.info{display:flex;flex-direction:column;min-width:0;flex:1}
+.info .caminho{font-weight:700;overflow-wrap:anywhere}
+.info .titulo{font-size:.88rem;color:var(--mu)}
+.contagem{font-size:.8rem;color:var(--mu);font-variant-numeric:tabular-nums;white-space:nowrap}
+.contagem.completo{color:var(--ok);font-weight:700}
+.cp{font:inherit;font-size:.78rem;font-weight:700;color:var(--brand-strong);background:var(--brand-soft);border:1px solid transparent;border-radius:8px;padding:.3rem .6rem;cursor:pointer;white-space:nowrap;flex:none}
+.cp:hover{border-color:var(--brand)}
+.cp.copiado{background:var(--brand);color:#fff}
+.corpo{padding:.2rem 1rem 1.1rem;display:flex;flex-direction:column;gap:.75rem;border-top:1px solid var(--bd)}
+.corpo>p:first-child{margin-top:.8rem}
+.simples{font-size:1rem}
+.dica,.fala,.aviso{font-size:.9rem;padding:.6rem .8rem;border-radius:10px}
+.dica{background:var(--info-bg);color:var(--info)}
+.fala{background:var(--sf2)}
+.aviso{background:var(--warn-bg);color:var(--warn);font-weight:600}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.tag{font-size:.74rem;font-weight:700;padding:.15rem .55rem;border-radius:999px;background:var(--sf2);color:var(--mu);border:1px solid var(--bd)}
+.corpo h3{font-size:.95rem;margin-top:.3rem}
+
+/* casos de teste */
+.caso{border:1px solid var(--bd);border-radius:10px;padding:.75rem .85rem;display:flex;flex-direction:column;gap:.55rem;background:var(--bg)}
+.caso.feito{border-color:color-mix(in srgb,var(--brand) 55%,var(--bd));background:color-mix(in srgb,var(--brand-soft) 55%,var(--bg))}
+.caso-topo{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.chk{display:flex;align-items:center;gap:.55rem;font-weight:700;cursor:pointer}
+.chk input{width:1.15rem;height:1.15rem;accent-color:var(--brand);cursor:pointer;flex:none}
+.st{font-weight:800;font-size:.8rem;padding:.15rem .55rem;border-radius:7px;font-variant-numeric:tabular-nums;flex:none}
+.st2{background:var(--ok-bg);color:var(--ok)}.st4{background:var(--warn-bg);color:var(--warn)}.st5{background:var(--err-bg);color:var(--err)}
+.como{font-size:.88rem;color:var(--mu)}
+.linha-req{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.linha-req code.url{flex:1;min-width:0;overflow-wrap:anywhere;background:var(--code);border:1px solid var(--bd);border-radius:8px;padding:.3rem .55rem}
+.auth{font-size:.86rem;color:var(--mu);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.bloco{border:1px solid var(--bd);border-radius:8px;overflow:hidden}
+.bloco-topo{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.3rem .55rem;background:var(--sf2);font-size:.76rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+pre{margin:0;padding:.6rem .75rem;background:var(--code);overflow:auto;max-height:340px;white-space:pre}
+details.resp>summary{cursor:pointer;font-size:.86rem;font-weight:700;color:var(--brand-strong);display:flex;align-items:center;gap:.5rem;list-style:none}
+details.resp>summary::-webkit-details-marker{display:none}
+details.resp>summary::before{content:"▸";transition:transform .15s}
+details.resp[open]>summary::before{transform:rotate(90deg)}
+details.resp pre{margin-top:.5rem;border:1px solid var(--bd);border-radius:8px}
+.nota{font-size:.8rem;color:var(--mu);margin-top:.35rem}
+.vazio{padding:2rem;text-align:center;color:var(--mu)}
+.toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%) translateY(20px);background:var(--brand);color:#fff;padding:.5rem 1rem;border-radius:999px;font-weight:700;font-size:.88rem;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.on{opacity:1;transform:translateX(-50%)}
+footer{max-width:1200px;margin:0 auto;padding:0 1rem 3rem;color:var(--mu);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{.topo,.lateral,.cp,.toast{display:none}.layout{display:block}details.rota{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav class="lateral" id="nav" aria-label="Seções"></nav>
+
+  <main>
+    <section class="painel" id="preparacao" aria-label="Legenda">
+
+      <div class="legenda">
+        <span>Legenda:</span>
+        <span class="metodo peq m-GET">GET</span> ler
+        <span class="metodo peq m-POST">POST</span> criar
+        <span class="metodo peq m-PUT">PUT</span> alterar
+        <span class="metodo peq m-DELETE">DELETE</span> apagar
+        <span class="st st2">2xx</span> deu certo
+      </div>
+    </section>
+
+    <div id="conteudo"></div>
+  </main>
+</div>
+
+<footer>
+  As respostas mostradas são exemplos reais, obtidos rodando cada teste na API: ids, datas e horários mudam a cada execução.
+  Listas longas aparecem resumidas (só os 2 primeiros itens). Guia gerado em <span id="gerado"></span>.
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Copiado ✓</div>
+
+<script>
+const DATA = {"base":"http://localhost:3001/api","gerado":"04/10/2026","secoes":[{"id":"auth","titulo":"Autenticação","intro":"Antes de qualquer coisa a API precisa saber quem você é. Aqui você cria uma conta, entra e recebe o token (um \"crachá digital\") que libera as outras rotas.","rotas":[{"id":"health","metodo":"GET","caminho":"/health","publica":true,"criterio":"Arquitetura","titulo":"Checar se a API está no ar","simples":"Pergunta simples: \"você está vivo?\". Não precisa de login. Se responder 200, o servidor subiu e está funcionando.","fala":"Rota pública de saúde. Plataformas de deploy (Render, por exemplo) usam uma rota assim para saber se o servidor subiu.","casos":[{"nome":"API respondendo","status":200,"real":{"body":{"status":"ok"},"cortado":false}}],"usa":[]},{"id":"register","metodo":"POST","caminho":"/auth/register","publica":true,"criterio":"Autenticação e segurança","titulo":"Cadastrar um usuário","simples":"Cria uma conta nova. A senha nunca é guardada como você digitou: o servidor a transforma em um \"embaralhado\" que não tem volta (hash bcrypt). Ao cadastrar, a API já devolve um token pronto para usar.","fala":"Mostre que a senha é salva com hash (bcrypt) e que a entrada é validada com Zod: nome, e-mail válido e senha de no mínimo 6 caracteres.","dica":"O e-mail deste guia muda sozinho a cada vez que você abre a página. Para repetir a demonstração com um e-mail novo, recarregue a página.","corpo":{"nome":"Aluno Teste","email":"{EMAIL}","senha":"123456"},"casos":[{"nome":"Cadastro válido","status":201,"real":{"body":{"usuario":{"id_usuario":4,"nome":"Aluno Teste","email":"zz-runner-6384@fazenda.com"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…"},"cortado":false}},{"nome":"E-mail que já existe","status":409,"erro":"E-mail já cadastrado","como":"Envie exatamente o mesmo corpo de novo.","real":{"body":{"error":"E-mail já cadastrado"},"cortado":false}},{"nome":"Dados inválidos (nome curto, e-mail ruim, senha curta)","status":400,"erro":"Dados inválidos","corpo":{"nome":"A","email":"isso-nao-e-email","senha":"123"},"real":{"body":{"error":"Dados inválidos","details":[{"campo":"nome","mensagem":"Nome deve ter ao menos 2 caracteres"},{"campo":"email","mensagem":"E-mail inválido"}]},"cortado":true}}],"usa":[]},{"id":"login","metodo":"POST","caminho":"/auth/login","publica":true,"criterio":"Autenticação e segurança","titulo":"Fazer login e pegar o token","simples":"Troca e-mail + senha por um token JWT. Esse token é o \"crachá\" que você mostra nas outras rotas. Dura 1 dia.","fala":"O token JWT é assinado com o segredo guardado no .env. Repare que e-mail inexistente e senha errada dão a MESMA mensagem: a API não revela se o e-mail existe.","dica":"Copie o valor de \"token\" da resposta e cole na variável token do ambiente do Insomnia (ou no header Authorization das outras requisições).","corpo":{"email":"admin@fazenda.com","senha":"123456"},"casos":[{"nome":"Login correto","status":200,"captura":{"TOKEN":"token"},"real":{"body":{"usuario":{"id_usuario":1,"nome":"Administrador","email":"admin@fazenda.com"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…"},"cortado":false}},{"nome":"Senha errada","status":401,"erro":"Credenciais inválidas","corpo":{"email":"admin@fazenda.com","senha":"senha-errada"},"real":{"body":{"error":"Credenciais inválidas"},"cortado":false}},{"nome":"E-mail que não existe","status":401,"erro":"Credenciais inválidas","corpo":{"email":"ninguem@fazenda.com","senha":"123456"},"real":{"body":{"error":"Credenciais inválidas"},"cortado":false}},{"nome":"E-mail em formato inválido","status":400,"erro":"Dados inválidos","corpo":{"email":"abc","senha":"123456"},"real":{"body":{"error":"Dados inválidos","details":[{"campo":"email","mensagem":"E-mail inválido"}]},"cortado":false}}],"usa":[]},{"id":"me","metodo":"GET","caminho":"/auth/me","criterio":"Autenticação e segurança","titulo":"Ver quem sou eu (rota protegida)","simples":"A rota protegida mais simples: só responde se você mandar um token válido. Devolve os dados do usuário logado.","fala":"Esta é a rota protegida exigida. Sem token, ou com token falso, o middleware barra com 401 antes mesmo de chegar ao controller.","casos":[{"nome":"Com token válido","status":200,"real":{"body":{"id_usuario":1,"nome":"Administrador","email":"admin@fazenda.com"},"cortado":false}},{"nome":"Sem token","status":401,"erro":"Token não informado","auth":false,"como":"Desmarque ou apague o header Authorization.","real":{"body":{"error":"Token não informado"},"cortado":false}},{"nome":"Token falso","status":401,"erro":"Token inválido ou expirado","auth":"invalido","como":"Use o header com um token inventado.","real":{"body":{"error":"Token inválido ou expirado"},"cortado":false}}],"usa":[]}]},{"id":"bovinos","titulo":"Bovinos (CRUD principal)","intro":"A entidade principal do sistema: cada animal do rebanho. Aqui está o CRUD completo (Create, Read, Update e Delete). Siga a ordem: o Delete é o último, para o animal de teste servir às demais rotas.","rotas":[{"id":"bov-criar","metodo":"POST","caminho":"/bovinos","criterio":"CRUD e validação","titulo":"Criar um animal (Create)","simples":"Cadastra um animal novo. Obrigatórios: nome, sexo (Macho ou Fêmea) e número do brinco, que é único no rebanho. Guarde o id_bovino da resposta: ele é o \"ID do animal de teste\" que entra no lugar de ID_DO_ANIMAL nas próximas rotas.","fala":"Duas camadas de proteção: o Zod barra dados ruins (400, com a lista de campos errados) e o banco barra brinco repetido (409).","dica":"Depois do 201, copie o \"id_bovino\" da resposta: ele substitui o ID_DO_ANIMAL nas rotas de buscar, atualizar e remover.","corpo":{"nome":"Teste Insomnia","sexo":"Macho","n_brinco":"{BRINCO}","id_raca":1,"data_nascimento":"2025-01-15"},"casos":[{"nome":"Criar com sucesso","status":201,"captura":{"ID_TESTE":"id_bovino"},"real":{"body":{"id_bovino":32,"id_raca":1,"idbovino_matriz":null,"sexo":"Macho","nome":"Teste Insomnia","data_nascimento":"2025-01-15T00:00:00.000Z","registro_po":null,"n_brinco":733986,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null},"cortado":false}},{"nome":"Brinco repetido","status":409,"erro":"Registro duplicado","como":"Envie exatamente o mesmo corpo de novo.","real":{"body":{"error":"Registro duplicado (valor único já existe)"},"cortado":false}},{"nome":"Campos inválidos","status":400,"erro":"Dados inválidos","corpo":{"nome":"","sexo":"Vaca","n_brinco":-5},"real":{"body":{"error":"Dados inválidos","details":[{"campo":"nome","mensagem":"Nome obrigatório"},{"campo":"sexo","mensagem":"Sexo deve ser 'Macho' ou 'Fêmea'"}]},"cortado":true}},{"nome":"Sem token","status":401,"erro":"Token não informado","auth":false,"real":{"body":{"error":"Token não informado"},"cortado":false}}],"usa":[]},{"id":"bov-listar","metodo":"GET","caminho":"/bovinos","criterio":"CRUD e validação","titulo":"Listar os animais (Read)","simples":"Devolve todos os animais. Dá para filtrar pela própria URL: ?busca= (nome ou brinco), ?sexo= e ?id_raca=. Cada animal já vem com a raça, a mãe (matriz) e o piquete atual.","fala":"Os filtros usam query string. Mostre um filtro funcionando para provar que a consulta é feita no banco.","casos":[{"nome":"Listar todos","status":200,"real":{"body":[{"id_bovino":1,"id_raca":1,"idbovino_matriz":null,"sexo":"Fêmea","nome":"Bonita","data_nascimento":"2020-01-10T00:00:00.000Z","registro_po":"ABCZ F 1045","n_brinco":845102,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-04-01T00:00:00.000Z","id_piquete":4,"id_bovino":1,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade"}}]},{"id_bovino":2,"id_raca":2,"idbovino_matriz":null,"sexo":"Fêmea","nome":"Fafa","data_nascimento":"2020-03-20T00:00:00.000Z","registro_po":null,"n_brinco":845115,"raca":{"id_raca":2,"linhagem":"Jersey"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-04-01T00:00:00.000Z","id_piquete":4,"id_bovino":2,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade"}}]}],"cortado":true}},{"nome":"Buscar por nome","status":200,"caminho":"/bovinos?busca=bonita","real":{"body":[{"id_bovino":1,"id_raca":1,"idbovino_matriz":null,"sexo":"Fêmea","nome":"Bonita","data_nascimento":"2020-01-10T00:00:00.000Z","registro_po":"ABCZ F 1045","n_brinco":845102,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-04-01T00:00:00.000Z","id_piquete":4,"id_bovino":1,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade"}}]}],"cortado":false}},{"nome":"Filtrar por sexo","status":200,"caminho":"/bovinos?sexo=Macho","real":{"body":[{"id_bovino":6,"id_raca":3,"idbovino_matriz":null,"sexo":"Macho","nome":"Bandido","data_nascimento":"2021-08-22T00:00:00.000Z","registro_po":null,"n_brinco":781055,"raca":{"id_raca":3,"linhagem":"Brahman"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-06-01T00:00:00.000Z","id_piquete":3,"id_bovino":6,"piquete":{"id_piquete":3,"nome":"Piquete C"}}]},{"id_bovino":9,"id_raca":3,"idbovino_matriz":null,"sexo":"Macho","nome":"Trovao","data_nascimento":"2021-12-01T00:00:00.000Z","registro_po":null,"n_brinco":650112,"raca":{"id_raca":3,"linhagem":"Brahman"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-06-01T00:00:00.000Z","id_piquete":3,"id_bovino":9,"piquete":{"id_piquete":3,"nome":"Piquete C"}}]}],"cortado":true}},{"nome":"Filtrar por raça","status":200,"caminho":"/bovinos?id_raca=1","real":{"body":[{"id_bovino":1,"id_raca":1,"idbovino_matriz":null,"sexo":"Fêmea","nome":"Bonita","data_nascimento":"2020-01-10T00:00:00.000Z","registro_po":"ABCZ F 1045","n_brinco":845102,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-04-01T00:00:00.000Z","id_piquete":4,"id_bovino":1,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade"}}]},{"id_bovino":4,"id_raca":1,"idbovino_matriz":null,"sexo":"Fêmea","nome":"TV","data_nascimento":"2021-05-05T00:00:00.000Z","registro_po":null,"n_brinco":512993,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"piquetes":[{"data_saida":null,"data_entrada":"2026-05-15T00:00:00.000Z","id_piquete":4,"id_bovino":4,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade"}}]}],"cortado":true}},{"nome":"Sem token","status":401,"erro":"Token não informado","auth":false,"real":{"body":{"error":"Token não informado"},"cortado":false}}],"usa":[]},{"id":"bov-get","metodo":"GET","caminho":"/bovinos/1","criterio":"CRUD e validação","titulo":"Buscar um animal pelo id (Read)","simples":"Devolve a ficha completa: dados, raça, mãe, filhos, pesagens, histórico, vacinas, tratamentos e piquetes por onde passou.","fala":"Uma única consulta traz o animal e todas as relações (Prisma include). Mostre também o 404 e o 400 para ids ruins.","casos":[{"nome":"Animal com histórico (id 1)","status":200,"real":{"body":{"id_bovino":1,"id_raca":1,"idbovino_matriz":null,"sexo":"Fêmea","nome":"Bonita","data_nascimento":"2020-01-10T00:00:00.000Z","registro_po":"ABCZ F 1045","n_brinco":845102,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"filhos":[{"id_bovino":21,"nome":"Bunitu","n_brinco":105633},{"id_bovino":23,"nome":"TESTEAPITRABALHO","n_brinco":12345678}],"pesagens":[{"id_bovino":1,"data":"2026-06-01T08:00:00.000Z","peso":"430"},{"id_bovino":1,"data":"2026-05-01T08:00:00.000Z","peso":"475"}],"historicos":[{"id_bovino":1,"data":"2026-05-10T00:00:00.000Z","descricao":"Parto sem intercorrencias, nascimento do Bunitu, saudavel."},{"id_bovino":1,"data":"2026-04-01T00:00:00.000Z","descricao":"Transferida para a Maternidade para inicio do monitoramento pre-parto."}],"vacinas":[{"dose":"5ml","data":"2026-05-01T00:00:00.000Z","id_vacina":1,"id_bovino":1,"vacina":{"id_vacina":1,"marca":"Vallee","antigeno":"Aftosa"}}],"tratamentos":[{"id_tratamento":3,"id_veterinario":1,"id_doenca":3,"data":"2026-06-01T00:00:00.000Z","id_bovino":1,"id_tipo_tratamento":4,"doenca":{"id_doenca":3,"nome":"Verme","sintoma":"Perda de peso e diarreia"},"veterinario":{"id_veterinario":1,"nome":"Dr. Carlos Silva","crmv":"12345-SC"},"tipo_tratamento":{"id_tipo_tratamento":4,"tipo":"Suplementacao"},"receitas":[{"dose":"5ml","id_medicamento":3,"id_tratamento":3,"medicamento":{"id_medicamento":3,"nome":"Vitamina ADE"}}]}],"piquetes":[{"data_saida":null,"data_entrada":"2026-04-01T00:00:00.000Z","id_piquete":4,"id_bovino":1,"piquete":{"id_piquete":4,"nome":"Piquete D - Maternidade","lotacao_max":14,"id_propriedade":1}},{"data_saida":"2026-04-01T00:00:00.000Z","data_entrada":"2026-03-01T00:00:00.000Z","id_piquete":3,"id_bovino":1,"piquete":{"id_piquete":3,"nome":"Piquete C","lotacao_max":25,"id_propriedade":1}}]},"cortado":true}},{"nome":"Animal de teste que você criou","status":200,"caminho":"/bovinos/{ID_TESTE}","real":{"body":{"id_bovino":32,"id_raca":1,"idbovino_matriz":null,"sexo":"Macho","nome":"Teste Insomnia","data_nascimento":"2025-01-15T00:00:00.000Z","registro_po":null,"n_brinco":733986,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null,"filhos":[],"pesagens":[],"historicos":[],"vacinas":[],"tratamentos":[],"piquetes":[]},"cortado":false}},{"nome":"Id que não existe","status":404,"erro":"Bovino não encontrado","caminho":"/bovinos/99999","real":{"body":{"error":"Bovino não encontrado"},"cortado":false}},{"nome":"Id que não é número","status":400,"erro":"Dados inválidos","caminho":"/bovinos/abc","real":{"body":{"error":"Dados inválidos","details":[{"campo":"","mensagem":"Expected number, received nan"}]},"cortado":false}}],"usa":["ID_TESTE"]},{"id":"cat-racas","metodo":"GET","caminho":"/racas","titulo":"Listar as raças (entidade relacionada)","simples":"Lê a entidade relacionada ao animal: as raças cadastradas (Nelore, Jersey, Brahman). Cada bovino aponta para uma raça pelo id_raca, o mesmo número que você usa ao criar um animal.","criterio":"Modelagem e persistência","fala":"É a segunda entidade do sistema, ligada a bovino por chave estrangeira. O requisito pede pelo menos a leitura da entidade relacionada.","casos":[{"nome":"Listar raças","status":200,"real":{"body":[{"id_raca":1,"linhagem":"Nelore"},{"id_raca":2,"linhagem":"Jersey"}],"cortado":true}},{"nome":"Sem token","status":401,"erro":"Token não informado","auth":false,"real":{"body":{"error":"Token não informado"},"cortado":false}}],"dica":"Use o id_raca daqui no corpo de \"Criar um animal\".","usa":[]},{"id":"bov-editar","metodo":"PUT","caminho":"/bovinos/{ID_TESTE}","criterio":"CRUD e validação","titulo":"Atualizar um animal (Update)","simples":"Altera só o que você mandar (atualização parcial). Pode enviar apenas {\"nome\": \"...\"} que o resto fica como está.","fala":"Atualização parcial validada: o Zod aceita qualquer subconjunto de campos, mas recusa corpo vazio e valores inválidos.","corpo":{"nome":"Teste Insomnia (editado)"},"casos":[{"nome":"Alterar só o nome","status":200,"real":{"body":{"id_bovino":32,"id_raca":1,"idbovino_matriz":null,"sexo":"Macho","nome":"Teste Insomnia (editado)","data_nascimento":"2025-01-15T00:00:00.000Z","registro_po":null,"n_brinco":733986,"raca":{"id_raca":1,"linhagem":"Nelore"},"matriz":null},"cortado":false}},{"nome":"Sexo inválido","status":400,"erro":"Dados inválidos","corpo":{"sexo":"Vaca"},"real":{"body":{"error":"Dados inválidos","details":[{"campo":"sexo","mensagem":"Sexo deve ser 'Macho' ou 'Fêmea'"}]},"cortado":false}},{"nome":"Corpo vazio","status":400,"erro":"Dados inválidos","corpo":{},"real":{"body":{"error":"Dados inválidos","details":[{"campo":"","mensagem":"Informe ao menos um campo para atualizar"}]},"cortado":false}},{"nome":"Animal que não existe","status":404,"erro":"Bovino não encontrado","caminho":"/bovinos/99999","real":{"body":{"error":"Bovino não encontrado"},"cortado":false}}],"usa":["ID_TESTE"]},{"id":"bov-excluir","metodo":"DELETE","caminho":"/bovinos/{ID_TESTE}","criterio":"CRUD e validação","titulo":"Remover o animal de teste (Delete)","simples":"Apaga o animal e tudo que depende dele (pesagens, histórico, vacinas, tratamentos e movimentações). Responde 204 e não devolve corpo.","fala":"O banco original não tinha exclusão em cascata; o service apaga os dependentes e desvincula os filhos dentro de uma transação.","dica":"CUIDADO: confira que o ID é o do animal de teste que você criou, e não o de um animal real.","casos":[{"nome":"Sem token","status":401,"erro":"Token não informado","auth":false,"real":{"body":{"error":"Token não informado"},"cortado":false}},{"nome":"Id que não é número","status":400,"erro":"Dados inválidos","caminho":"/bovinos/abc","real":{"body":{"error":"Dados inválidos","details":[{"campo":"","mensagem":"Expected number, received nan"}]},"cortado":false}},{"nome":"Remover o animal de teste","status":204,"real":{"body":null,"cortado":false}},{"nome":"Remover de novo (já não existe)","status":404,"erro":"Bovino não encontrado","real":{"body":{"error":"Bovino não encontrado"},"cortado":false}}],"usa":["ID_TESTE"]}]}]};
+const fill = function fill(v, V) {
+  if (typeof v === 'string') {
+    const m = v.match(/^\{(\w+)\}$/);
+    if (m && m[1] in V) return V[m[1]];
+    return v.replace(/\{(\w+)\}/g, (s, k) => (k in V ? V[k] : s));
+  }
+  if (Array.isArray(v)) return v.map((x) => fill(x, V));
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fill(x, V)]));
+  return v;
+};
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const rnd = (a, b) => Math.floor(Math.random() * (b - a)) + a;
+const hoje = new Date().toLocaleDateString('sv-SE');
+const STORE = 'sgdsb-guia-v1';
+
+const gerar = () => ({ brinco: rnd(700000, 899999), email: `aluno${rnd(1000, 9999)}@fazenda.com`, crmv: `${rnd(10000, 99999)}-SC` });
+let S = { base: DATA.base, usarVar: false, done: {}, idTeste: '', open: {}, ...gerar() };
+try {
+  const salvo = JSON.parse(localStorage.getItem(STORE) || 'null');
+  if (salvo) S = { ...S, done: salvo.done || {} };
+} catch {}
+const salvar = () => { try { localStorage.setItem(STORE, JSON.stringify({ base: S.base, usarVar: S.usarVar, done: S.done })); } catch {} };
+
+const ROTAS = {};
+DATA.secoes.forEach((s) => s.rotas.forEach((r) => (ROTAS[r.id] = r)));
+
+const vars = () => ({ HOJE: hoje, BRINCO: S.brinco, EMAIL: S.email, CRMV: S.crmv, ID_TESTE: 'ID_DO_ANIMAL' });
+const baseUrl = () => (S.usarVar ? '{{ _.base_url }}' : S.base.trim().replace(/\/+$/, ''));
+const valorAuth = () => (S.usarVar ? 'Bearer {{ _.token }}' : 'Bearer COLE_SEU_TOKEN_AQUI');
+
+function corpoDe(r, c, v) {
+  if (c.corpoBruto !== undefined) return c.corpoBruto;
+  const src = c.corpo !== undefined ? c.corpo : r.corpo;
+  return src === undefined ? null : JSON.stringify(fill(src, v), null, 2);
+}
+
+function textoCopiar(act, rid, ci) {
+  const r = ROTAS[rid], c = ci >= 0 ? r.casos[ci] : null, v = vars();
+  if (act === 'url') return baseUrl() + fill((c && c.caminho) ?? r.caminho, v);
+  if (act === 'body') return corpoDe(r, c, v);
+  if (act === 'auth') return valorAuth();
+  if (act === 'falso') return 'Bearer abc';
+  if (act === 'ct') return 'application/json';
+  return '';
+}
+
+function casoHTML(r, c, i, v) {
+  const id = `${r.id}:${i}`;
+  const url = baseUrl() + fill(c.caminho ?? r.caminho, v);
+  const corpo = corpoDe(r, c, v);
+  const real = c.real;
+  let auth;
+  if (c.auth === 'invalido') auth = `⚠️ Token falso: header <code>Authorization: Bearer abc</code> <button class="cp" type="button" data-act="falso" data-r="${r.id}" data-c="${i}">Copiar valor</button>`;
+  else if (c.auth === false && !r.publica) auth = '🚫 Sem token: desmarque ou apague o header <code>Authorization</code>.';
+  else if (r.publica) auth = '🔓 Rota pública: não precisa de token.';
+  else auth = `🔒 Header <code>Authorization</code> com o token do login <button class="cp" type="button" data-act="auth" data-r="${r.id}" data-c="${i}">Copiar valor</button>`;
+  const faixa = String(c.status)[0];
+  const resp = real
+    ? `<details class="resp" data-key="resp:${id}" ${S.open['resp:' + id] ? 'open' : ''}><summary>Ver resposta esperada <span class="st st${faixa}">${c.status}</span></summary>
+         <pre>${real.body === null ? '(resposta vazia, sem corpo)' : esc(JSON.stringify(real.body, null, 2))}</pre>
+         ${real.cortado ? '<p class="nota">Lista resumida: a API devolve todos os itens, aqui aparecem só os 2 primeiros.</p>' : ''}</details>`
+    : '';
+  return `<div class="caso ${S.done[id] ? 'feito' : ''}" data-caso="${id}">
+    <div class="caso-topo">
+      <label class="chk"><input type="checkbox" data-chk="${id}" ${S.done[id] ? 'checked' : ''}><span>${esc(c.nome)}</span></label>
+      <span class="st st${faixa}" title="Status HTTP esperado">${c.status}</span>
+    </div>
+    ${c.como ? `<p class="como">▶ ${esc(c.como)}</p>` : ''}
+    <div class="linha-req"><span class="metodo peq m-${r.metodo}">${r.metodo}</span><code class="url">${esc(url)}</code>
+      <button class="cp" type="button" data-act="url" data-r="${r.id}" data-c="${i}">Copiar URL</button></div>
+    <p class="auth">${auth}</p>
+    ${corpo !== null ? `<p class="auth">📎 Header <code>Content-Type</code> com o valor <code>application/json</code> <button class="cp" type="button" data-act="ct" data-r="${r.id}" data-c="${i}">Copiar valor</button></p>` : ''}
+    ${corpo !== null ? `<div class="bloco"><div class="bloco-topo"><span>Body (JSON)</span><button class="cp" type="button" data-act="body" data-r="${r.id}" data-c="${i}">Copiar corpo</button></div><pre>${esc(corpo)}</pre></div>` : ''}
+    ${resp}
+  </div>`;
+}
+
+function rotaHTML(r, v) {
+  const feitos = r.casos.filter((_, i) => S.done[`${r.id}:${i}`]).length;
+  const avisos = [];
+  if (r.usa.includes('ID_TESTE')) avisos.push('Troque <code>ID_DO_ANIMAL</code> na URL pelo <strong>id_bovino</strong> que a rota "Criar um animal" devolveu (seção 2).');
+  const caminho = baseUrl() + fill(r.caminho, v);
+  return `<details class="rota" id="r-${r.id}" data-key="rota:${r.id}" ${S.open['rota:' + r.id] ? 'open' : ''}>
+    <summary>
+      <span class="metodo m-${r.metodo}">${r.metodo}</span>
+      <span class="info"><code class="caminho">${esc(caminho)}</code><span class="titulo">${esc(r.titulo)}</span></span>
+      <span class="contagem ${feitos === r.casos.length ? 'completo' : ''}" data-contagem="${r.id}">${feitos}/${r.casos.length}</span>
+      <button class="cp" type="button" data-act="url" data-r="${r.id}" data-c="-1">Copiar URL</button>
+    </summary>
+    <div class="corpo">
+      <p class="simples">${esc(r.simples)}</p>
+      ${avisos.map((a) => `<p class="aviso">⚠️ ${a}</p>`).join('')}
+      ${r.dica ? `<p class="dica">💡 ${esc(r.dica)}</p>` : ''}
+      ${r.fala ? `<p class="fala"><strong>💬 Para falar na apresentação:</strong> ${esc(r.fala)}</p>` : ''}
+      <div class="tags"><span class="tag">Critério: ${esc(r.criterio)}</span>${r.publica ? '<span class="tag">Rota pública</span>' : '<span class="tag">🔒 Protegida</span>'}</div>
+      <h3>Testes esperados (${r.casos.length})</h3>
+      ${r.casos.map((c, i) => casoHTML(r, c, i, v)).join('')}
+    </div>
+  </details>`;
+}
+
+function render() {
+  const v = vars();
+  $('#conteudo').innerHTML = DATA.secoes.map((s, i) => `
+    <section class="secao" id="s-${s.id}" data-sec="${s.id}">
+      <h2><span class="num">${i + 1}</span>${esc(s.titulo)}</h2>
+      <p class="intro">${esc(s.intro)}</p>
+      ${s.rotas.map((r) => rotaHTML(r, v)).join('')}
+    </section>`).join('');
+  navegacao(); observar();
+}
+
+function navegacao() {
+  const atual = $('.lateral a.ativo')?.getAttribute('href');
+  $('#nav').innerHTML = DATA.secoes.map((s, i) => {
+    const total = s.rotas.reduce((n, r) => n + r.casos.length, 0);
+    const feitos = s.rotas.reduce((n, r) => n + r.casos.filter((_, k) => S.done[`${r.id}:${k}`]).length, 0);
+    return `<a href="#s-${s.id}" data-nav="${s.id}"><span>${i + 1}. ${esc(s.titulo)}</span><small>${feitos}/${total}</small></a>`;
+  }).join('');
+  if (atual) $(`.lateral a[href="${atual}"]`)?.classList.add('ativo');
+}
+
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1300); }
+async function copiar(texto, btn) {
+  try { await navigator.clipboard.writeText(texto); }
+  catch {
+    const t = document.createElement('textarea'); t.value = texto; t.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); } catch {} t.remove();
+  }
+  if (btn) { const antes = btn.textContent; btn.classList.add('copiado'); btn.textContent = 'Copiado ✓'; setTimeout(() => { btn.classList.remove('copiado'); btn.textContent = antes; }, 1200); }
+  toast('Copiado ✓');
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const texto = b.dataset.act === 'el' ? document.getElementById(b.dataset.el).textContent : textoCopiar(b.dataset.act, b.dataset.r, Number(b.dataset.c));
+  if (texto) copiar(texto, b);
+});
+
+document.addEventListener('change', (e) => {
+  const c = e.target.closest('[data-chk]');
+  if (!c) return;
+  const id = c.dataset.chk, [rid] = id.split(':');
+  if (c.checked) S.done[id] = true; else delete S.done[id];
+  salvar();
+  c.closest('.caso').classList.toggle('feito', c.checked);
+  const r = ROTAS[rid], feitos = r.casos.filter((_, i) => S.done[`${rid}:${i}`]).length;
+  const cont = $(`[data-contagem="${rid}"]`); cont.textContent = `${feitos}/${r.casos.length}`; cont.classList.toggle('completo', feitos === r.casos.length);
+  navegacao();
+});
+
+$('#conteudo').addEventListener('toggle', (e) => { const k = e.target.dataset && e.target.dataset.key; if (k) S.open[k] = e.target.open; }, true);
+
+let t;
+const agendar = () => { clearTimeout(t); t = setTimeout(render, 150); };
+
+const io = 'IntersectionObserver' in window
+  ? new IntersectionObserver((es) => {
+      es.forEach((en) => { if (en.isIntersecting) $$('.lateral a').forEach((a) => a.classList.toggle('ativo', a.getAttribute('href') === '#' + en.target.id)); });
+    }, { rootMargin: '-20px 0px -65% 0px' })
+  : null;
+function observar() {
+  if (!io) return;
+  io.disconnect();
+  $$('section.secao').forEach((x) => io.observe(x));
+  io.observe($('#preparacao'));
+}
+
+$('#gerado').textContent = DATA.gerado;
+render();
+</script>
+</body>
+</html>

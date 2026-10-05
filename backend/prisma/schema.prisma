@@ -1,0 +1,188 @@
+// Modelo reaproveitado do trabalho de Banco de Dados (SGDSB - Saúde Bovina).
+// Nomes de tabelas/colunas idênticos ao ddl.sql original; acrescentada apenas a tabela usuario (autenticação).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id_usuario Int      @id @default(autoincrement())
+  nome       String   @db.VarChar(100)
+  email      String   @unique @db.VarChar(150)
+  senha_hash String   @db.VarChar(100)
+  criado_em  DateTime @default(now())
+
+  @@map("usuario")
+}
+
+model Raca {
+  id_raca  Int      @id @default(autoincrement())
+  linhagem String?  @db.VarChar(50)
+  bovinos  Bovino[]
+
+  @@map("raca")
+}
+
+model Propriedade {
+  id_propriedade Int        @id @default(autoincrement())
+  nome           String?    @db.VarChar(50)
+  localizacao    String?    @db.VarChar(200)
+  piquetes       Piquete[]
+
+  @@map("propriedade")
+}
+
+model Piquete {
+  id_piquete     Int              @id @default(autoincrement())
+  nome           String?          @db.VarChar(50)
+  lotacao_max    Int?
+  id_propriedade Int?
+  propriedade    Propriedade?     @relation(fields: [id_propriedade], references: [id_propriedade])
+  movimentacoes  PiqueteBovino[]
+
+  @@map("piquete")
+}
+
+model Bovino {
+  id_bovino       Int              @id @default(autoincrement())
+  id_raca         Int?
+  idbovino_matriz Int?
+  sexo            String?          @db.VarChar(50)
+  nome            String?          @db.VarChar(50)
+  data_nascimento DateTime?        @db.Date
+  registro_po     String?          @db.VarChar(50)
+  n_brinco        Int?             @unique
+
+  raca            Raca?            @relation(fields: [id_raca], references: [id_raca])
+  matriz          Bovino?          @relation("Genealogia", fields: [idbovino_matriz], references: [id_bovino])
+  filhos          Bovino[]         @relation("Genealogia")
+
+  historicos      Historico[]
+  tratamentos     Tratamento[]
+  piquetes        PiqueteBovino[]
+  vacinas         VacinaBovino[]
+  pesagens        Pesagem[]
+
+  @@map("bovino")
+}
+
+model Veterinario {
+  id_veterinario Int          @id @default(autoincrement())
+  nome           String?      @db.VarChar(50)
+  crmv           String?      @db.VarChar(50)
+  tratamentos    Tratamento[]
+
+  @@map("veterinario")
+}
+
+model Historico {
+  id_bovino Int
+  data      DateTime @db.Date
+  descricao String?  @db.VarChar(1000)
+  bovino    Bovino   @relation(fields: [id_bovino], references: [id_bovino])
+
+  @@id([id_bovino, data])
+  @@map("historico")
+}
+
+model TipoTratamento {
+  id_tipo_tratamento Int          @id @default(autoincrement())
+  tipo               String?      @db.VarChar(50)
+  tratamentos        Tratamento[]
+
+  @@map("tipo_tratamento")
+}
+
+model Medicamento {
+  id_medicamento Int       @id @default(autoincrement())
+  nome           String?   @db.VarChar(50)
+  receitas       Receita[]
+
+  @@map("medicamento")
+}
+
+model Doenca {
+  id_doenca   Int          @id @default(autoincrement())
+  nome        String?      @db.VarChar(50)
+  sintoma     String?      @db.VarChar(200)
+  tratamentos Tratamento[]
+
+  @@map("doenca")
+}
+
+model Tratamento {
+  id_tratamento      Int             @id @default(autoincrement())
+  id_veterinario     Int?
+  id_doenca          Int?
+  data               DateTime?       @db.Date
+  id_bovino          Int?
+  id_tipo_tratamento Int?
+
+  veterinario        Veterinario?    @relation(fields: [id_veterinario], references: [id_veterinario])
+  doenca             Doenca?         @relation(fields: [id_doenca], references: [id_doenca])
+  bovino             Bovino?         @relation(fields: [id_bovino], references: [id_bovino])
+  tipo_tratamento    TipoTratamento? @relation(fields: [id_tipo_tratamento], references: [id_tipo_tratamento])
+  receitas           Receita[]
+
+  @@unique([data, id_bovino, id_tipo_tratamento])
+  @@map("tratamento")
+}
+
+model PiqueteBovino {
+  data_saida   DateTime? @db.Date
+  data_entrada DateTime  @db.Date
+  id_piquete   Int
+  id_bovino    Int
+  piquete      Piquete   @relation(fields: [id_piquete], references: [id_piquete])
+  bovino       Bovino    @relation(fields: [id_bovino], references: [id_bovino])
+
+  @@id([data_entrada, id_piquete, id_bovino])
+  @@map("piquete_bovino")
+}
+
+model Vacina {
+  id_vacina Int            @id @default(autoincrement())
+  marca     String?        @db.VarChar(50)
+  antigeno  String?        @db.VarChar(50)
+  aplicacoes VacinaBovino[]
+
+  @@map("vacina")
+}
+
+model VacinaBovino {
+  dose      String?  @db.VarChar(50)
+  data      DateTime @db.Date
+  id_vacina Int
+  id_bovino Int
+  vacina    Vacina   @relation(fields: [id_vacina], references: [id_vacina])
+  bovino    Bovino   @relation(fields: [id_bovino], references: [id_bovino])
+
+  @@id([data, id_vacina, id_bovino])
+  @@map("vacina_bovino")
+}
+
+model Pesagem {
+  id_bovino Int
+  data      DateTime @db.Timestamp(6)
+  peso      Decimal? @db.Decimal
+  bovino    Bovino   @relation(fields: [id_bovino], references: [id_bovino])
+
+  @@id([id_bovino, data])
+  @@map("pesagem")
+}
+
+model Receita {
+  dose           String?     @db.VarChar(50)
+  id_medicamento Int
+  id_tratamento  Int
+  medicamento    Medicamento @relation(fields: [id_medicamento], references: [id_medicamento])
+  tratamento     Tratamento  @relation(fields: [id_tratamento], references: [id_tratamento])
+
+  @@id([id_medicamento, id_tratamento])
+  @@map("receita")
+}

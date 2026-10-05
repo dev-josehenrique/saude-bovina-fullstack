@@ -1,0 +1,2 @@
+module.exports = (req, res) =>
+  res.status(404).json({ error: `Rota ${req.method} ${req.originalUrl} não encontrada` });
