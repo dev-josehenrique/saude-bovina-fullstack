@@ -1,3 +1,4 @@
+// Controller de autenticação: valida a entrada e chama o service para cadastro, login e perfil do usuário logado.
 const service = require('../services/auth.service');
 const { registroSchema, loginSchema } = require('../validators/auth.validator');
 

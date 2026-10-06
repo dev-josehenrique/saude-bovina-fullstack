@@ -1,3 +1,4 @@
+// Relatórios em SQL: animais tratados por veterinário, peso médio de adultos e histórico de lotação dos piquetes.
 const prisma = require('../lib/prisma');
 
 // Consultas SQL do trabalho de Banco de Dados (relatorios.py), com casts para tipos serializáveis em JSON.

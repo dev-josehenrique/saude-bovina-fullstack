@@ -1,3 +1,4 @@
+// Regras de negócio e acesso ao banco para veterinários, incluindo a garantia de CRMV único.
 const prisma = require('../lib/prisma');
 const AppError = require('../lib/AppError');
 

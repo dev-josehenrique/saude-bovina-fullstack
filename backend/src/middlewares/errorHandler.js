@@ -1,3 +1,4 @@
+// Tratamento central de erros: converte falhas de validação, AppError e erros do Prisma em respostas JSON padronizadas.
 const { ZodError } = require('zod');
 const { Prisma } = require('@prisma/client');
 const AppError = require('../lib/AppError');

@@ -1,3 +1,4 @@
+// Controller de tratamentos e registros do animal: listagens, ocorrências no histórico, novo tratamento e vacinação em lote.
 const service = require('../services/tratamento.service');
 const vacinacao = require('../services/vacinacao.service');
 const registro = require('../services/registro.service');

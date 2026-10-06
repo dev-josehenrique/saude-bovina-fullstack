@@ -1,3 +1,4 @@
+// Esquemas Zod de validação de bovinos (criação, atualização), pesagem e id de rota.
 const { z } = require('zod');
 
 const data = z

@@ -1,3 +1,4 @@
+// Controller de piquetes: valida a entrada e chama o service para listar, buscar por id e criar piquetes.
 const service = require('../services/piquete.service');
 const { criarPiqueteSchema } = require('../validators/piquete.validator');
 const { idSchema } = require('../validators/bovino.validator');

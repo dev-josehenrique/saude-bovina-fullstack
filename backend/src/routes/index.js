@@ -1,3 +1,4 @@
+// Define todas as rotas da API (públicas e protegidas por JWT) e liga cada uma ao seu controller.
 const { Router } = require('express');
 const auth = require('../middlewares/auth');
 const authCtrl = require('../controllers/auth.controller');

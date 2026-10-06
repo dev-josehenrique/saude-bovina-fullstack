@@ -1,3 +1,4 @@
+// Regras de autenticação: cadastro com senha criptografada (bcrypt), login e geração do token JWT.
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../lib/prisma');

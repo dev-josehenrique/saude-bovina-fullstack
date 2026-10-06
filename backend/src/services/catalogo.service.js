@@ -1,3 +1,4 @@
+// Consultas simples de apoio: raças, propriedades (com piquetes) e vacinas.
 const prisma = require('../lib/prisma');
 
 const bovinoResumo = { select: { id_bovino: true, nome: true, n_brinco: true } };

@@ -1,3 +1,4 @@
+// Controller de veterinários: valida a entrada e chama o service para listar, buscar, criar e atualizar veterinários.
 const service = require('../services/veterinario.service');
 const { criarVeterinarioSchema, atualizarVeterinarioSchema } = require('../validators/piquete.validator');
 const { idSchema } = require('../validators/bovino.validator');

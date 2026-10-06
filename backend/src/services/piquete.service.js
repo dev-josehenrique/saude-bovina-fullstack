@@ -1,3 +1,4 @@
+// Regras de negócio e acesso ao banco para piquetes: listagem com nº de animais atuais, detalhe e criação.
 const prisma = require('../lib/prisma');
 const AppError = require('../lib/AppError');
 

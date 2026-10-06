@@ -1,3 +1,4 @@
+// Configura a aplicação Express: CORS, leitura de JSON, rotas em /api e middlewares de rota não encontrada e de erro.
 const express = require('express');
 const cors = require('cors');
 const { corsOrigins } = require('./config/env');

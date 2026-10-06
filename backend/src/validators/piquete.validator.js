@@ -1,3 +1,4 @@
+// Esquemas Zod de validação de piquetes e de veterinários (criação e atualização).
 const { z } = require('zod');
 
 const criarPiqueteSchema = z.object({

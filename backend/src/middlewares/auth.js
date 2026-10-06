@@ -1,3 +1,4 @@
+// Middleware de autenticação: valida o token JWT do cabeçalho Authorization e identifica o usuário (401 se inválido).
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/env');
 const AppError = require('../lib/AppError');

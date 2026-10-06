@@ -1,3 +1,4 @@
+// Controller de consultas auxiliares (raças, propriedades, vacinas) e dos relatórios.
 const service = require('../services/catalogo.service');
 const relatorios = require('../services/relatorio.service');
 

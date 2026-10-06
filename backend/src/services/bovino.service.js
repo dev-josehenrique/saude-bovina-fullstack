@@ -1,3 +1,4 @@
+// Regras de negócio e acesso ao banco para bovinos: listagem com filtros, detalhe, CRUD, pesagem e remoção em transação.
 const prisma = require('../lib/prisma');
 const AppError = require('../lib/AppError');
 

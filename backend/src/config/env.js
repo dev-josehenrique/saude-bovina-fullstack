@@ -1,3 +1,4 @@
+// Carrega o .env, exige DATABASE_URL e JWT_SECRET e exporta as configurações (porta, JWT, origens CORS).
 require('dotenv').config();
 
 const required = ['DATABASE_URL', 'JWT_SECRET'];

@@ -1,3 +1,4 @@
+// Aplicação de vacina em vários animais de uma vez, em transação (vacina existente ou nova).
 const prisma = require('../lib/prisma');
 const AppError = require('../lib/AppError');
 

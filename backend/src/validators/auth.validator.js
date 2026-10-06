@@ -1,3 +1,4 @@
+// Esquemas Zod de validação do cadastro e do login de usuários.
 const { z } = require('zod');
 
 const registroSchema = z.object({

@@ -1,3 +1,4 @@
+// Consulta de tratamentos (com filtros por veterinário, animal e tipo) e dos tipos de tratamento.
 const prisma = require('../lib/prisma');
 
 const incluir = {

@@ -1,3 +1,4 @@
+// Registro de ocorrências no histórico e de tratamentos individuais (com receita opcional); lista doenças e medicamentos.
 const prisma = require('../lib/prisma');
 const AppError = require('../lib/AppError');
 const { Prisma } = require('@prisma/client');

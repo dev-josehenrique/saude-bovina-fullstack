@@ -1,3 +1,4 @@
+// Esquemas Zod de validação de ocorrência no histórico, vacinação em lote e tratamento.
 const { z } = require('zod');
 
 const data = z

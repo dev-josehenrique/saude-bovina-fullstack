@@ -1,3 +1,4 @@
+// Controller de bovinos: valida a entrada e chama o service para listar, buscar, criar, atualizar, remover e registrar pesagem.
 const service = require('../services/bovino.service');
 const {
   criarBovinoSchema,
